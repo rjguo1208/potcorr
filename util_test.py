@@ -17,7 +17,7 @@ cell_list = [
     lab.bn_13x13, 
     lab.bn_14x14, 
     lab.bn_15x15]
-
+fig,ax = plt.subplots(figsize = (8,6), dpi = 100)
 for cell in cell_list:
     
     '''
@@ -214,11 +214,12 @@ for cell in cell_list:
     ttkw.write_xsf(ftype='pot_bare', filedir=ttkw.folder+'dpot_h_calc.xsf')
     '''
     
-    Rho1=io_xsf.Rho(cell['folder']+'1-dn/Rho.xsf')
-    Pot1=io_xsf.Pot(cell['folder']+'1-dn/Pot_b.xsf')
+    Rho1=io_xsf.Rho(cell['folder']+'drho.xsf')
+    #Pot1=io_xsf.Pot(cell['folder']+'1-dn/Pot_b.xsf')
     #bgc = np.average(Rho1.rho)
     #Rho1.rho = Rho1.rho-bgc
     #print(np.sum(Rho1.rho)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
-    #print(np.sum(Pot1.pot*Rho1.rho)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
-    print(np.sum(Pot1.pot)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
-    
+    #print(np.sum(Pot1.pot*bgc)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
+    #print(np.sum(Pot1.pot)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
+    ax.plot(np.array(range(np.shape(Rho1.rho)[0]))-0.5*np.shape(Rho1.rho)[0], np.sum(Rho1.rho, axis=(1,2)))
+plt.show()
