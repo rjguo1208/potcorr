@@ -22,9 +22,16 @@ class PotCorr():
         self.sc = np.array(cell['sc'])
         self.fft_g = np.array(cell['fft_g'])
         self.lattpara = self.lattpara_unit*self.sc/const.Bohr_R
+        if self.ibrav == 4:
+            self.omega = self.lattpara_unit[0]*self.sc[0] * \
+                         self.lattpara_unit[1]*self.sc[1] * \
+                         self.lattpara_unit[2]*self.sc[2] * \
+                         np.sqrt(3)/2 / (const.Bohr_R)**3
+    
 
     def fft_init(self):
         print('Begin FFT grids Initialization')
+
         self.fft_nx=self.fft_g[0]
         self.fft_ny=self.fft_g[1]
         self.fft_nz=self.fft_g[2]
@@ -108,23 +115,23 @@ class PotCorr():
 
     def read_rho_bare(self, rho_bare_file):
         Rho = io_xsf.Rho(rho_bare_file)
-        self.rho_bare_r = Rho.rho
+        self.rho_bare_r = Rho.rho#*Rho.omega/Rho.nx/Rho.ny/Rho.nz
         self.rho_bare_k = np.fft.fftn(self.rho_bare_r)
 
     def read_rho_tot(self, rho_tot_file):
         Rho = io_xsf.Rho(rho_tot_file)
-        self.rho_tot_r = Rho.rho
+        self.rho_tot_r = Rho.rho#*Rho.omega/Rho.nx/Rho.ny/Rho.nz
         self.rho_tot_k = np.fft.fftn(self.rho_tot_r)  
 
     def read_pot_bare(self, pot_bare_file):
         Pot = io_xsf.Pot(pot_bare_file)
         self.pot_bare_r = Pot.pot
-        self.pot_bare_k = np.fft.ifftn(self.pot_bare_k)
+        self.pot_bare_k = np.fft.ifftn(self.pot_bare_r)
 
     def read_pot_tot(self, pot_tot_file):
         Pot = io_xsf.Pot(pot_tot_file)
         self.pot_tot_r = Pot.pot
-        self.pot_tot_k = np.fft.ifftn(self.pot_tot_k)
+        self.pot_tot_k = np.fft.ifftn(self.pot_tot_r)
 
 
 
@@ -201,7 +208,43 @@ class PotCorr():
         self.g_epsind_tt = g_epsind_tt
         self.g_epsind0_tt = g_epsind0_tt 
 
-    
+
+    def epsmat_init_interp(self):
+        Eps1=self.Chi1
+        Eps0=self.Chi0
+        nx_, ny_, nz_ = self.fft_nx, self.fft_ny, self.fft_nz
+        g_tuple_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
+        g_tuple_floor_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
+        g_tuple_q_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
+        g_rhoind_tt = np.empty((nx_,ny_,nz_), dtype = int)
+        q_ind_tt = np.empty((nx_,ny_,nz_), dtype = int)
+        gg_eps = int(len(Eps1.G_vec2ind))
+
+        for i in range(nx_):
+            for j in range(ny_):
+                for k in range(nz_):
+                    g_tuple_tt[i,j,k] = (float(format(self.fft_kxx_tt[i,j,k],'.8f')), 
+                                         float(format(self.fft_kyy_tt[i,j,k],'.8f')), 
+                                         float(format(self.fft_kzz_tt[i,j,k],'.8f')))
+                    g_tuple_floor_tt[i,j,k] = (math.floor(g_tuple_tt[i,j,k][0]), 
+                                               math.floor(g_tuple_tt[i,j,k][1]), 
+                                               math.floor(g_tuple_tt[i,j,k][2]))
+                    g_tuple_q_tt[i,j,k] = (float(format(g_tuple_tt[i,j,k][0]-g_tuple_floor_tt[i,j,k][0],'.8f')),
+                                           float(format(g_tuple_tt[i,j,k][1]-g_tuple_floor_tt[i,j,k][1],'.8f')),
+                                           float(format(g_tuple_tt[i,j,k][2]-g_tuple_floor_tt[i,j,k][2],'.8f')))
+                    if g_tuple_floor_tt[i,j,k] in Eps1.G_vec2ind:
+                        g_rhoind_tt[i,j,k] = Eps1.G_vec2ind[g_tuple_floor_tt[i,j,k]]
+                    else:
+                        g_rhoind_tt[i,j,k] = gg_eps
+
+        
+            print(i)
+        self.g_rhoind_tt = g_rhoind_tt
+        self.g_tuple_q_tt = g_tuple_q_tt
+
+
+
+
     def get_chimat(self, G_ind_cut = 1300):
         Eps1=self.Chi1
         chi_mat = np.zeros((len(Eps1.qpts),G_ind_cut, G_ind_cut), dtype=complex)
@@ -298,7 +341,7 @@ class PotCorr():
         self.pot_tot_k = self.rho_tot_k*vcoul_tmp_
         self.pot_tot_r = np.fft.ifftn(self.pot_tot_k)
 
-    def pot2rho_bare(self, kernel='3d'):
+    def pot2rho_bare(self, kernel='3d', ncharge=0):
         if kernel == '3d':
             vcoul_tmp_ = self.v_coul
         elif kernel == '2d':
@@ -309,11 +352,11 @@ class PotCorr():
             print('Undefined kernel type!')
             return
         self.rho_bare_k = self.pot_bare_k/vcoul_tmp_
-        self.rho_bare_k[0,0,0] = 0
+        self.rho_bare_k[0,0,0] = ncharge/self.omega*self.fft_nx*self.fft_ny*self.fft_nz
         self.rho_bare_r = np.fft.ifftn(self.rho_bare_k)
 
 
-    def pot2rho_tot(self, kernel='3d'):
+    def pot2rho_tot(self, kernel='3d', ncharge=0):
         if kernel == '3d':
             vcoul_tmp_ = self.v_coul
         elif kernel == '2d':
@@ -324,7 +367,7 @@ class PotCorr():
             print('Undefined kernel type!')
             return
         self.rho_tot_k = self.pot_tot_k/vcoul_tmp_
-        self.rho_tot_k[0,0,0] = 0
+        self.rho_tot_k[0,0,0] = ncharge/self.omega*self.fft_nx*self.fft_ny*self.fft_nz
         self.rho_tot_r = np.fft.ifftn(self.rho_tot_k)
 
     def pot_bare2tot(self, kernel='3d', G_ind_cut=1300):
@@ -484,7 +527,7 @@ class PotCorr():
 
 if __name__ == '__main__':
 
-    cell = lab.bn_6x6
+    cell = lab.bn_12x12
    # cell = lab.mos2_tt
     #cell = lab.bn_6x6
     print('Starting job for '+cell['prefix']+'...')
@@ -492,44 +535,45 @@ if __name__ == '__main__':
     #Eps1 = read_eps.Epsmat(cell['folder']+'chimat.h5')
     #np.save(cell['folder']+'chi0mat.npy', Eps1.mat)
 
-    mos2=PotCorr(cell)
-    print(mos2.prefix)
-    print(mos2.lattpara_unit)
+    ttkw=PotCorr(cell)
+    print(ttkw.prefix)
+    print(ttkw.lattpara_unit)
    # print(type(mos2.lattpara_unit))
 
-    mos2.fft_init()
-    mos2.get_vcoul()
-    mos2.get_greenfunc()
-    mos2.read_chi()
+    ttkw.fft_init()
+    ttkw.get_vcoul()
+    ttkw.get_greenfunc()
+    ttkw.read_chi()
    # mos2.get_pointc_pot_bare(position='center', kernel='3d')
     #print(mos2.v_coul)
    # mos2.read_rho_bare(mos2.folder+'inp/rho_6pad12_coarse.xsf')
-    mos2.read_rho_bare(mos2.folder+'rho_bare_ex.xsf')
+    ttkw.read_rho_tot(ttkw.folder+'drho.xsf')
     #print(np.shape(mos2.rho_bare_r)) 
     #mos2.rho_bare_r[:,:,:30] = 0
     #mos2.rho_bare_r[:,:,-30:] = 0
     #mos2.read_rho_bare(cell['rho_bare'])
     #mos2.read_rho_tot(cell['rho_tot'])
     
-    mos2.rho2pot_bare(kernel='gf')
-    mos2.epsmat_init()
+    ttkw.rho2pot_tot(kernel='3d')
+    ttkw.epsmat_init()
     #print(mos2.q_ind_tt)
-    mos2.get_epsmat(G_ind_cut = 1000, kernel='gf')
-    mos2.epsmat_inv(G_ind_cut = 1000)
-    del mos2.Chi0
-    del mos2.Chi1
-    mos2.pot_bare2tot(kernel='gf', G_ind_cut=1000)
+    ttkw.get_epsmat(G_ind_cut = 1000, kernel='3d')
+    ttkw.epsmat_inv(G_ind_cut = 1000)
+    del ttkw.Chi0
+    del ttkw.Chi1
+    ttkw.pot_tot2bare(kernel='3d', G_ind_cut=600)
 
     #print(mos2.pot_tot_r)
-    #mos2.pot2rho_bare(kernel='3d')
+    ttkw.pot2rho_bare(kernel='3d', ncharge=1)
 
-    mos2.write_xsf(ftype='pot_tot', filedir=mos2.folder+'pot_tot_iso.xsf')
+    ttkw.write_xsf(ftype='rho_bare', filedir=ttkw.folder+'rho_bare.xsf')
     #mos2.write_xsf(ftype='rho_bare', filedir=mos2.folder+'rho_bare.xsf')
     info = psutil.virtual_memory()
-    print(u'Occupied memory：',psutil.Process(os.getpid()).memory_info().rss/1024/1024)
-    print(u'Total memory：',info.total/1024/1024)
+    print(u'Occupied memory：',psutil.Process(os.getpid()).memory_info().rss/1024/1024, 'MB')
+    print(u'Total memory：',info.total/1024/1024, 'MB')
 
 
     
-    print(u'Percent：',info.percent)
+    print(u'Percent：',info.percent,'%')
     print(u'Number of Cup：',psutil.cpu_count())
+

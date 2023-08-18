@@ -4,20 +4,15 @@ import utli
 import io_xsf 
 import lab
 import  matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.colors as mcolors
 import potcorr
 
-cell_list = [
-    lab.bn_6x6,
-    lab.bn_7x7,
-    lab.bn_8x8,
-    lab.bn_9x9,
-    lab.bn_10x10, 
-    lab.bn_11x11, 
-    lab.bn_12x12, 
-    lab.bn_13x13, 
-    lab.bn_14x14, 
-    lab.bn_15x15]
-
+#cell_list = [lab.bn_6x6,lab.bn_7x7,lab.bn_8x8,lab.bn_9x9,lab.bn_10x10, 
+ #   lab.bn_11x11,lab.bn_12x12,lab.bn_13x13,lab.bn_14x14,lab.bn_15x15]
+#cell_list = [lab.bn_6x6_relaxed, lab.bn_9x9_relaxed]
+cell_list = [lab.bn_6x6, lab.bn_12x12]
+#fig,ax = plt.subplots(figsize = (8,6), dpi = 100)
 for cell in cell_list:
     
     '''
@@ -91,20 +86,21 @@ for cell in cell_list:
 
 
 
-    '''
+    #'''
     #Pot_tot = io_xsf.Pot(cell['folder_out']+'pot_tot.xsf')
-    Pot_tot = io_xsf.Rho(cell['folder_dft']+'drho.xsf')
+    #Pot_tot = io_xsf.Rho(cell['folder_dft']+'drho.xsf')
     #Pot_tot = io_xsf.Pot(cell['folder_dft']+'dv.xsf')
-    potential = Pot_tot.rho
+    Rho1 = io_xsf.Rho(cell['folder']+'rho_bare.xsf')
+    chgden = Rho1.rho
 
-    nx, ny, nz = Pot_tot.nx, Pot_tot.ny, Pot_tot.nz
+    nx, ny, nz = Rho1.nx, Rho1.ny, Rho1.nz
     print(nz)
 
     #potential_2d = np.mean(potential[:,:,80], axis=2)
-    potential_2d = potential[:,:,int(nz*0.5)]
-
-    x = np.arange(0, potential_2d.shape[0])
-    y = np.arange(0, potential_2d.shape[1])
+    chgden_2d = chgden[:,:,90]
+    chgden_2d = np.sum(chgden[:,:,80:90], axis=2)
+    x = np.arange(0, chgden_2d.shape[0])
+    y = np.arange(0, chgden_2d.shape[1])
 
     #x = np.copy(a)
     #y = np.copy(b)
@@ -114,21 +110,24 @@ for cell in cell_list:
 
     x = X.flatten()-0.5*Y.flatten()
     y = Y.flatten()*np.sqrt(3)*0.5 #- X.flatten()*0.5
-    z = potential_2d.flatten()
+    z = chgden_2d.flatten()
 
+    norm= mcolors.TwoSlopeNorm(vmin=-0.3*z.max(), vmax=0.3*z.max(), vcenter=0)
     fig, ax = plt.subplots(dpi=150)
     hb = ax.scatter(x, y, c=z, 
                     #gridsize=100,
                     #vmin=-0.08,
                     #vmax=-0.0,
-                      cmap='hot')
+                    norm=norm,
+                  #    cmap='coolwarm')
+                    cmap='bwr')
     ax.set_aspect('equal', adjustable='box')
     #ax.set_xlim(0, 180)
     #ax.set_ylim(0, 180)
     cb = fig.colorbar(hb, ax=ax)
     cb.set_label('Potential')
     plt.show()
-    '''
+    #'''
 
     '''
     Pot_tot = io_xsf.Pot(cell['folder_out']+'pot_tot.xsf')
@@ -214,11 +213,24 @@ for cell in cell_list:
     ttkw.write_xsf(ftype='pot_bare', filedir=ttkw.folder+'dpot_h_calc.xsf')
     '''
     
-    Rho1=io_xsf.Rho(cell['folder']+'1-dn/Rho.xsf')
-    Pot1=io_xsf.Pot(cell['folder']+'1-dn/Pot_b.xsf')
+    #Rho1=io_xsf.Rho(cell['folder']+'drho.xsf')
+    #print(float(Rho1.a1[0]))
+    #Pot1=io_xsf.Pot(cell['folder']+'1-dn/Pot_b.xsf')
+    print(np.sum(Rho1.rho)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
+    print(np.sum(Rho1.rho[int(Rho1.nx/2)-54:int(Rho1.nx/2)+54,int(Rho1.nx/2)-54:int(Rho1.nx/2)+54,: ])*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
+    #print(np.average(Pot1.pot)/np.average(Rho1.rho))
     #bgc = np.average(Rho1.rho)
     #Rho1.rho = Rho1.rho-bgc
     #print(np.sum(Rho1.rho)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
-    #print(np.sum(Pot1.pot*Rho1.rho)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
-    print(np.sum(Pot1.pot)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
-    
+    #print(np.sum(Pot1.pot*bgc)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz))
+    #print(np.sum(Pot1.pot)*Rho1.omega/(Rho1.nx)/(Rho1.ny)/(Rho1.nz)*0.5)
+    #ax.plot(np.linspace(-0.5*float(Rho1.a1[0]), 0.5*float(Rho1.a1[0]), int(Rho1.nx)), np.sum(Rho1.rho,axis=(1,2)))
+    #plt.subplots(dpi = 200)  
+    #im1=plt.imshow(Rho1.rho[:,:,30],extent=[0, 216,0, 216], cmap=matplotlib.cm.hot, interpolation='nearest', origin="lower")#pl.cm.jet   
+    #plt.colorbar(im1)  
+    #plt.show()
+    #plt.subplots(dpi = 200)  
+    #im1=plt.imshow(np.abs(pot_k)[:20,:20,0],extent=[0, 20,0, 20], cmap=matplotlib.cm.hot, interpolation='nearest', origin="lower")#pl.cm.jet  
+    #plt.colorbar(im1) 
+ 
+#plt.show()
