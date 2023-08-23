@@ -2,6 +2,12 @@ import potcorr
 import psutil
 import os
 import lab
+import numpy as np
+import pickle
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+
 
 cell = lab.bn_12x12
 # cell = lab.mos2_tt
@@ -17,44 +23,51 @@ print(ttkw.lattpara_unit)
 # print(type(mos2.lattpara_unit))
 
 ttkw.fft_init()
-ttkw.get_vcoul()
-ttkw.get_greenfunc()
-ttkw.read_chi()
-# mos2.get_pointc_pot_bare(position='center', kernel='3d')
-#print(mos2.v_coul)
-# mos2.read_rho_bare(mos2.folder+'inp/rho_6pad12_coarse.xsf')
-ttkw.read_rho_tot(ttkw.folder+'drho.xsf')
-#print(np.shape(mos2.rho_bare_r)) 
-#mos2.rho_bare_r[:,:,:30] = 0
-#mos2.rho_bare_r[:,:,-30:] = 0
-#mos2.read_rho_bare(cell['rho_bare'])
-#mos2.read_rho_tot(cell['rho_tot'])
 
-ttkw.epsmat_init_interp()
-print(ttkw.g_rhoind_tt)
-print(ttkw.g_tuple_q_tt)
+ttkw.epsmat_init_interp(G_vec2ind_dict=cell['folder_G_info']+'G_vec2ind.pkl',
+                        G_ind2vec_dict=cell['folder_G_info']+'G_ind2vec.pkl')
+#print(ttkw.g_tuple_floor_tt)
+#print(ttkw.g_rhoind_tt)
+#print(ttkw.g_tuple_q_tt)
 
-'''
-ttkw.rho2pot_tot(kernel='3d')
-ttkw.epsmat_init()
-#print(mos2.q_ind_tt)
-ttkw.get_epsmat(G_ind_cut = 1000, kernel='3d')
-ttkw.epsmat_inv(G_ind_cut = 1000)
-del ttkw.Chi0
-del ttkw.Chi1
-ttkw.pot_tot2bare(kernel='3d', G_ind_cut=600)
+with open(cell['folder_model']+'model_all_re.pkl','rb') as file:
+    model_all_re = pickle.load(file)
+with open(cell['folder_model']+'model_all_im.pkl','rb') as file:
+    model_all_im = pickle.load(file)
+with open(cell['folder_G_info']+'Gind_list.pkl','rb') as file:
+    Gind_list = pickle.load(file)
 
-#print(mos2.pot_tot_r)
-ttkw.pot2rho_bare(kernel='3d', ncharge=1)
 
-ttkw.write_xsf(ftype='rho_bare', filedir=ttkw.folder+'rho_bare.xsf')
-#mos2.write_xsf(ftype='rho_bare', filedir=mos2.folder+'rho_bare.xsf')
+print(Gind_list)
+
+#model_all_re
+
+
+
+#for j in Gind_list:
+#    print(j)
+#    for jp in Gind_list:
+#        if f'model_{j}_{jp}' not in model_all_re:
+#            print(f'Missing model_{j}_{jp}')
+#            break
+#        
+
+
+
+#unique_tuples = set()
+#for matrix in ttkw.g_tuple_floor_tt:
+#    for row in matrix:
+#        for tup in row:
+#            unique_tuples.add(tup)
+
+#print(f"Number of unique tuples: {len(unique_tuples)}")
+#for tup in unique_tuples:
+#    print(tup)
+
+
+
 info = psutil.virtual_memory()
 print(u'Occupied memory：',psutil.Process(os.getpid()).memory_info().rss/1024/1024, 'MB')
 print(u'Total memory：',info.total/1024/1024, 'MB')
-
-
-
 print(u'Percent：',info.percent,'%')
-print(u'Number of Cup：',psutil.cpu_count())
-'''
+print(u'Number of Cpus：',psutil.cpu_count())

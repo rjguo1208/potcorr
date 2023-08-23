@@ -4,6 +4,7 @@ import lab
 import const
 import numpy as np
 import math
+import pickle
 import psutil
 import os
 
@@ -209,16 +210,18 @@ class PotCorr():
         self.g_epsind0_tt = g_epsind0_tt 
 
 
-    def epsmat_init_interp(self):
-        Eps1=self.Chi1
-        Eps0=self.Chi0
+    def epsmat_init_interp(self,G_vec2ind_dict, G_ind2vec_dict):
+        with open(G_vec2ind_dict, "rb") as file_:
+            G_vec2ind = pickle.load(file_)
+        with open(G_ind2vec_dict, "rb") as file_:
+            G_ind2vec = pickle.load(file_)
         nx_, ny_, nz_ = self.fft_nx, self.fft_ny, self.fft_nz
         g_tuple_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_tuple_floor_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_tuple_q_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_rhoind_tt = np.empty((nx_,ny_,nz_), dtype = int)
         q_ind_tt = np.empty((nx_,ny_,nz_), dtype = int)
-        gg_eps = int(len(Eps1.G_vec2ind))
+        gg_eps = int(len(G_vec2ind))
 
         for i in range(nx_):
             for j in range(ny_):
@@ -232,16 +235,18 @@ class PotCorr():
                     g_tuple_q_tt[i,j,k] = (float(format(g_tuple_tt[i,j,k][0]-g_tuple_floor_tt[i,j,k][0],'.8f')),
                                            float(format(g_tuple_tt[i,j,k][1]-g_tuple_floor_tt[i,j,k][1],'.8f')),
                                            float(format(g_tuple_tt[i,j,k][2]-g_tuple_floor_tt[i,j,k][2],'.8f')))
-                    if g_tuple_floor_tt[i,j,k] in Eps1.G_vec2ind:
-                        g_rhoind_tt[i,j,k] = Eps1.G_vec2ind[g_tuple_floor_tt[i,j,k]]
+                    if g_tuple_floor_tt[i,j,k] in G_vec2ind:
+                        g_rhoind_tt[i,j,k] = G_vec2ind[g_tuple_floor_tt[i,j,k]]
                     else:
                         g_rhoind_tt[i,j,k] = gg_eps
 
         
-            print(i)
+            print(i,"/",nx_)
+        self.g_tuple_floor_tt = g_tuple_floor_tt
         self.g_rhoind_tt = g_rhoind_tt
         self.g_tuple_q_tt = g_tuple_q_tt
-
+        self.G_ind2vec = G_ind2vec
+        self.G_vec2ind = G_vec2ind
 
 
 
@@ -266,6 +271,11 @@ class PotCorr():
                #         chi_mat[i,j,jp] = chi_mat[i,j,jp]+1.0
 
         self.chi_mat = chi_mat
+
+    def get_chimat_interp(self, q_ind, G_ind_cut):
+        chi_mat = np.zeros((len(q_ind), G_ind_cut, G_ind_cut), dtype=complex)
+        
+        
 
     
 
