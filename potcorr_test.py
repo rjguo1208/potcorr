@@ -3,6 +3,11 @@ import psutil
 import os
 import lab
 import numpy as np
+import pickle
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+
 
 cell = lab.bn_12x12
 # cell = lab.mos2_tt
@@ -19,31 +24,36 @@ print(ttkw.lattpara_unit)
 
 ttkw.fft_init()
 
-ttkw.epsmat_init_interp(G_vec2ind_dict='D:/data/charged_defect/bn_2/G_vec2ind.pkl',
-                        G_ind2vec_dict='D:/data/charged_defect/bn_2/G_ind2vec.pkl')
-print(ttkw.g_tuple_floor_tt)
-print(ttkw.g_rhoind_tt)
-print(ttkw.g_tuple_q_tt)
+ttkw.epsmat_init_interp(G_vec2ind_dict=cell['folder_G_info']+'G_vec2ind.pkl',
+                        G_ind2vec_dict=cell['folder_G_info']+'G_ind2vec.pkl')
+#print(ttkw.g_tuple_floor_tt)
+#print(ttkw.g_rhoind_tt)
+#print(ttkw.g_tuple_q_tt)
 
-Gind_list = []
-for i in range(72959):
-    iix0, iiy0, iiz0 = ttkw.G_ind2vec[i]
-    if np.abs(iix0)<=2 and np.abs(iiy0)<=2 and np.abs(iiz0)<=25:
-        Gind_list.append(i)
-print(len(Gind_list))
+with open(cell['folder_model']+'model_all_re.pkl','rb') as file:
+    model_all_re = pickle.load(file)
+with open(cell['folder_model']+'model_all_im.pkl','rb') as file:
+    model_all_im = pickle.load(file)
+with open(cell['folder_G_info']+'Gind_list.pkl','rb') as file:
+    Gind_list = pickle.load(file)
 
-model_list=[]
 
-for j in Gind_list:
-    for jp in Gind_list:
-        model_name = f"D:/data/charged_defect/bn_2/chi_interp/chi_interp/model_{j}_{jp}.pkl"
-        if os.path.isfile(model_name):
-            #print(f"'{model_name}' is a file and exists!")
-            model_list.append(f"{j}_{jp}")
-        #else:
-            #print(f"'{model_name}' is not a file or does not exist!")
+tensor_gind = ttkw.g_rhoind_tt
+gind_reduced = tensor_gind[tensor_gind < len(Gind_list)]
 
-print(len(model_list))
+
+
+
+
+
+#for j in Gind_list:
+#    print(j)
+#    for jp in Gind_list:
+#        if f'model_{j}_{jp}' not in model_all_re:
+#            print(f'Missing model_{j}_{jp}')
+#            break
+#        
+
 
 
 #unique_tuples = set()
