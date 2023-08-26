@@ -118,7 +118,7 @@ for i0_ in Gind_list:
 
     #    plt.show()
 
-        with open(f'D:/data/charged_defect/bn/chi_interp/model_{i0_}_{i1_}.pkl','wb') as f:
-            pickle.dump(model_2d,f)
+    #    with open(f'D:/data/charged_defect/bn/chi_interp/model_{i0_}_{i1_}.pkl','wb') as f:
+    #        pickle.dump(model_2d,f)
 
 

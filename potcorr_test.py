@@ -38,9 +38,11 @@ with open(cell['folder_G_info']+'Gind_list.pkl','rb') as file:
     Gind_list = pickle.load(file)
 
 
-print(Gind_list)
+tensor_gind = ttkw.g_rhoind_tt
+gind_reduced = tensor_gind[tensor_gind < len(Gind_list)]
 
-#model_all_re
+
+
 
 
 

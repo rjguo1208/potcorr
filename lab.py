@@ -53,7 +53,7 @@ bn_3x3 = {
 
 bn_6x6 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/6x6/',
+    'folder': tt['folder']+'bn/6x6/',
     'folder_dft': tt['folder']+'bn/dft/6x6/',
     'folder_chi': tt['folder']+'bn/chi_6x6/',
     'folder_out': tt['folder']+'bn/out/6x6',
@@ -64,15 +64,32 @@ bn_6x6 = {
                      2.51,
                      25],
     'sc': [6,6,1],
-   # 'fft_g':[109,109,181]
     'fft_g':[108,108,180]
+
+}
+
+bn_6x6_relaxed = {
+    'prefix': 'bn',
+    'folder': tt['folder']+'bn_relaxed/6x6/',
+    'folder_dft': tt['folder']+'bn/dft/6x6/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'folder_out': tt['folder']+'bn/out/6x6',
+    'rho_tot': tt['folder']+'bn/dft/6x6/drho.xsf',
+    'is2d': True,
+    'ibrav': 4,
+    'lattpara_unit':[2.51,
+                     2.51,
+                     25],
+    'sc': [6,6,1],
+    'fft_g':[108,108,180]
+
 }
 
 bn_7x7 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/7x7/',
+    'folder': tt['folder']+'bn/7x7/',
     'folder_dft': tt['folder']+'bn/dft/7x7/',
-    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'folder_chi': tt['folder']+'bn/chi_7x7/',
     'is2d': True,
     'ibrav': 4,
     'lattpara_unit':[2.51,
@@ -84,7 +101,7 @@ bn_7x7 = {
 
 bn_8x8 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/8x8/',
+    'folder': tt['folder']+'bn/8x8/',
     'folder_dft': tt['folder']+'bn/dft/8x8/',
     'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
@@ -98,7 +115,21 @@ bn_8x8 = {
 
 bn_9x9 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/9x9/',
+    'folder': tt['folder']+'bn/9x9/',
+    'folder_dft': tt['folder']+'bn/dft/9x9/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': True,
+    'ibrav': 4,
+    'lattpara_unit':[2.51,
+                     2.51,
+                     25],
+    'sc': [9,9,1],
+    'fft_g':[162,162,180]
+}
+
+bn_9x9_relaxed = {
+    'prefix': 'bn',
+    'folder': tt['folder']+'bn_relaxed/9x9/',
     'folder_dft': tt['folder']+'bn/dft/9x9/',
     'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
@@ -112,7 +143,7 @@ bn_9x9 = {
 
 bn_10x10 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/10x10/',
+    'folder': tt['folder']+'bn/10x10/',
     'folder_dft': tt['folder']+'bn/dft/10x10/',
     'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
@@ -126,7 +157,7 @@ bn_10x10 = {
 
 bn_11x11 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/11x11/',
+    'folder': tt['folder']+'bn/11x11/',
     'folder_dft': tt['folder']+'bn/dft/11x11/',
     'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
@@ -140,7 +171,7 @@ bn_11x11 = {
 
 bn_12x12 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/12x12/',
+    'folder': tt['folder']+'bn/12x12/',
     'folder_dft': tt['folder']+'bn/dft/12x12/',
     'folder_chi': tt['folder']+'bn/chi_12x12/',
     'folder_out': tt['folder']+'bn/out/12x12',
@@ -151,15 +182,19 @@ bn_12x12 = {
                      2.51,
                      25],
     'sc': [12,12,1],
-    'fft_g':[216,216,180]
+    'fft_g':[216,216,180],
+    'folder_G_info': tt['folder']+'bn/G_info/',
+    'folder_model': tt['folder']+'bn/model_interp/'
+
+
+
 }
+
 bn_13x13 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/13x13/',
-    'folder_dft': tt['folder']+'bn/dft/12x12/',
-    'folder_chi': tt['folder']+'bn/chi_12x12/',
-    'folder_out': tt['folder']+'bn/out/12x12',
-    'rho_tot': tt['folder']+'bn/dft/12x12/drho.xsf',
+    'folder': tt['folder']+'bn/13x13/',
+    'folder_dft': tt['folder']+'bn/dft/13x13/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
     'ibrav': 4,
     'lattpara_unit':[2.51,
@@ -168,35 +203,30 @@ bn_13x13 = {
     'sc': [13,13,1],
     'fft_g':[240,240,180]
 }
-
 bn_14x14 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/14x14/',
-    'folder_dft': tt['folder']+'bn/dft/12x12/',
-    'folder_chi': tt['folder']+'bn/chi_12x12/',
-    'folder_out': tt['folder']+'bn/out/12x12',
-    'rho_tot': tt['folder']+'bn/dft/12x12/drho.xsf',
+    'folder': tt['folder']+'bn/14x14/',
+    'folder_dft': tt['folder']+'bn/dft/14x14/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
     'ibrav': 4,
     'lattpara_unit':[2.51,
                      2.51,
                      25],
     'sc': [14,14,1],
-    'fft_g':[256,256,180]
+    'fft_g':[256,256,180]    
 }
 
 bn_15x15 = {
     'prefix': 'bn',
-    'folder': tt['folder']+'bn_2/15x15/',
+    'folder': tt['folder']+'bn/15x15/',
     'folder_dft': tt['folder']+'bn/dft/15x15/',
-    'folder_chi': tt['folder']+'bn/chi_12x12/',
-    'folder_out': tt['folder']+'bn/out/12x12',
-    'rho_tot': tt['folder']+'bn/dft/12x12/drho.xsf',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
     'is2d': True,
     'ibrav': 4,
     'lattpara_unit':[2.51,
                      2.51,
                      25],
     'sc': [15,15,1],
-    'fft_g':[270,270,180]
+    'fft_g':[270,270,180]    
 }
