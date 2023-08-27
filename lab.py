@@ -230,3 +230,73 @@ bn_15x15 = {
     'sc': [15,15,1],
     'fft_g':[270,270,180]    
 }
+
+diamond_1x1x1 = {
+    'prefix': 'diamond',
+    'folder': tt['folder']+'diamond/1x1x1/',
+    'folder_dft': tt['folder']+'diamond/1x1x1/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': False,
+    'ibrav': 1,
+    'lattpara_unit':[3.5607451098,
+                     3.5607451098,
+                     3.5607451098],
+    'sc': [1,1,1],
+    'fft_g':[32,32,32]    
+}
+
+diamond_2x2x2 = {
+    'prefix': 'diamond',
+    'folder': tt['folder']+'diamond/2x2x2/',
+    'folder_dft': tt['folder']+'diamond/2x2x2/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': False,
+    'ibrav': 1,
+    'lattpara_unit':[3.5607451098,
+                     3.5607451098,
+                     3.5607451098],
+    'sc': [2,2,2],
+    'fft_g':[64,64,64]    
+}
+
+diamond_3x3x3 = {
+    'prefix': 'diamond',
+    'folder': tt['folder']+'diamond/3x3x3/',
+    'folder_dft': tt['folder']+'diamond/3x3x3/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': False,
+    'ibrav': 1,
+    'lattpara_unit':[3.5607451098,
+                     3.5607451098,
+                     3.5607451098],
+    'sc': [3,3,3],
+    'fft_g':[96,96,96]    
+}
+
+diamond_3x3x3 = {
+    'prefix': 'diamond',
+    'folder': tt['folder']+'diamond/3x3x3/',
+    'folder_dft': tt['folder']+'diamond/3x3x3/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': False,
+    'ibrav': 1,
+    'lattpara_unit':[3.5607451098,
+                     3.5607451098,
+                     3.5607451098],
+    'sc': [4,4,4],
+    'fft_g':[125,125,125]    
+}
+
+diamond_1x1x1 = {
+    'prefix': 'diamond',
+    'folder': tt['folder']+'diamond/1x1x1/',
+    'folder_dft': tt['folder']+'diamond/1x1x1/',
+    'folder_chi': tt['folder']+'bn/chi_6x6/',
+    'is2d': False,
+    'ibrav': 1,
+    'lattpara_unit':[3.5607451098,
+                     3.5607451098,
+                     3.5607451098],
+    'sc': [1,1,1],
+    'fft_g':[32,32,32]    
+}
