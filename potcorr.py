@@ -586,4 +586,5 @@ if __name__ == '__main__':
     
     print(u'Percent：',info.percent,'%')
     print(u'Number of Cup：',psutil.cpu_count())
+    
 
