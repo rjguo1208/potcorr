@@ -151,7 +151,9 @@ bn_12x12 = {
                      2.51,
                      25],
     'sc': [12,12,1],
-    'fft_g':[216,216,180]
+    'fft_g':[216,216,180],
+    'folder_G_info': tt['folder']+'bn_2/G_info/',
+    'folder_model': tt['folder']+'bn_2/model_interp/'
 }
 bn_13x13 = {
     'prefix': 'bn',
