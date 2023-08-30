@@ -215,12 +215,34 @@ class PotCorr():
             G_vec2ind = pickle.load(file_)
         with open(G_ind2vec_dict, "rb") as file_:
             G_ind2vec = pickle.load(file_)
+
+        J_to_Ry = 1 / (2.17987e-18)
+        a_0 = 0.52917721067e-10
+        Ang= 1e-10
+        h_bar = 1.0545718e-34
+        m_electron = 9.10938356e-31
+
+        a_ = float(self.lattpara_unit[0])*Ang
+        c_ = float(self.lattpara_unit[2])*Ang
+
+        if self.ibrav == 4:
+            b1_ = (2 * np.pi / a_) * np.array([1, 1/np.sqrt(3), 0])
+            b2_ = (2 * np.pi / a_) * np.array([0, 2/np.sqrt(3), 0])
+            b3_ = (2 * np.pi / c_) * np.array([0, 0, 1])
+        elif self.ibrav == 1:
+            b1_ = (2 * np.pi / a_) * np.array([1, 0, 0])
+            b2_ = (2 * np.pi / a_) * np.array([0, 1, 0])
+            b3_ = (2 * np.pi / c_) * np.array([0, 0, 1])
+        
+       
+        
         nx_, ny_, nz_ = self.fft_nx, self.fft_ny, self.fft_nz
         g_tuple_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_tuple_floor_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_tuple_q_tt = np.empty((nx_,ny_,nz_), dtype = tuple)
         g_rhoind_tt = np.empty((nx_,ny_,nz_), dtype = int)
         q_ind_tt = np.empty((nx_,ny_,nz_), dtype = int)
+        E_Gqvec_tt = np.empty((nx_, ny_, nz_),dtype=float)
         gg_eps = int(len(G_vec2ind))
 
         for i in range(nx_):
@@ -240,6 +262,11 @@ class PotCorr():
                     else:
                         g_rhoind_tt[i,j,k] = gg_eps
 
+                    G_q_vector = self.fft_kxx_tt[i,j,k]*b1_ + self.fft_kyy_tt[i,j,k]*b2_ + self.fft_kzz_tt[i,j,k]*b3_
+                    E_k = (h_bar**2 * np.linalg.norm(G_q_vector)**2) / (2 * m_electron)
+                    E_k_Ry = E_k * J_to_Ry
+                    E_Gqvec_tt[i,j,k] = E_k_Ry
+
         
             print(i,"/",nx_)
         self.g_tuple_floor_tt = g_tuple_floor_tt
@@ -247,7 +274,11 @@ class PotCorr():
         self.g_tuple_q_tt = g_tuple_q_tt
         self.G_ind2vec = G_ind2vec
         self.G_vec2ind = G_vec2ind
+        self.E_Gqvec_tt = E_Gqvec_tt
 
+    
+
+                
 
 
     def get_chimat(self, G_ind_cut = 1300):
