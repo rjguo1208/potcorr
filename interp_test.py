@@ -57,7 +57,7 @@ iiz_list = []
 epsz_re_list = []
 epsz_im_list = []
 model_list = []
-
+'''
 for i0_ in Gind_list:
     print(i0_)
     for i1_ in Gind_list:
@@ -160,4 +160,4 @@ print(len(model_list))
     #    with open(f'D:/data/charged_defect/bn/chi_interp/model_{i0_}_{i1_}.pkl','wb') as f:
     #        pickle.dump(model_2d,f)
 
-
+'''
